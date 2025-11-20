@@ -7,7 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase, relationship
 from datetime import datetime
 
-DATABASE_URL = "sqlite+aiosql:///./test.db"
+
+
+
+DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+
 
 class Base(DeclarativeBase):
     pass
