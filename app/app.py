@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import os
 import uuid
-
+from app.users import current_active_user, AuthenticationBackend, FastAPIUsers, UserCreate, UserRead, UserUpdate
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,7 +18,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
+app.include_router(
+    FastAPIUsers.get_auth_router(AuthenticationBackend), prefix="/auth/jwt", tags=["auth"]
+)
+app.include_router(
+    FastAPIUsers.get_register_router(user_schema=UserRead, user_create_schema=UserCreate), prefix="/auth", tags=["auth"]
+)
+app.include_router(
+    FastAPIUsers.get_users_router(user_schema=UserRead, user_update_schema=UserUpdate), prefix="/users", tags=["users"], dependencies=[Depends(current_active_user)]
+)
 
 @app.post('/upload_file')
 async def upload_file(
@@ -110,4 +118,4 @@ async def delete_post(post_id: str, session: AsyncSession = Depends(get_async_se
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid post ID")
     
-    
+
